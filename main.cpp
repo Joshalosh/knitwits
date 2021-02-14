@@ -36,9 +36,9 @@ int main()
 
         DrawPoly(Vector2{500, 200}, sides % 12, 64, (rotation+rotation), BLUE);
 
-        Vector2 vertices[] = {Vector2{30, 0}, Vector2{0, 100},
+        Vector2 vertices[] = {Vector2{30, 0},    Vector2{0, 100},
                               Vector2{100, 120}, Vector2{120, 50},
-                              Vector2{80, 20}, Vector2{150, 80}};
+                              Vector2{80, 20},   Vector2{150, 80}};
 
         DrawTriangleFan(vertices, sizeof(vertices) / sizeof(vertices[0]), PURPLE);
         EndDrawing();
