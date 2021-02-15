@@ -1,3 +1,14 @@
-# Compiled source #
-###################
+# Ignore all exe files
 *.exe
+
+# Ignore all log files
+*.log
+
+*.ilk
+*.pdb
+
+# Ignore all object files
+*.obj
+
+# Ignore all sln files
+*.sln

@@ -1,46 +1,44 @@
 #include "include/raylib.h"
+#include <stdio.h>
 
 int main()
 {
-    int WindowWidth  = 1280;
-    int WindowHeight = 720;
+    int window_width  = 900;
+    int window_height = 600;
 
-    InitWindow(WindowWidth, WindowHeight, "MyGame");
-
+    InitWindow(window_width, window_height, "MyGame");
     SetTargetFPS(60);
+
+    Texture2D scarfy = LoadTexture("../assets/scarfy.png");
+
+    float scarfy_frame_width = scarfy.width / 6;
+    float timer = 0.0f;
+
+    int frame = 0;
+    int scarfy_max_frames = (int)(scarfy.width / (int)scarfy_frame_width);
 
     while(!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        static float rotation = 0.0f;
-        rotation += 1.0f;
-
-        static float timer = 0.0f;
-        static int sides   = 0;
-
         timer += GetFrameTime();
-        if (timer > 0.2f)
+
+        if(timer >= 0.2f)
         {
             timer = 0.0f;
-            sides++;
+            frame++;
         }
 
-        DrawRectangle(100, 100, 100, 300, RED);
-        DrawRectangleV(Vector2{300, 200}, Vector2{100, 30}, BLUE);
-        //DrawRectangleRec(Rectangle{200, 200, 100, 100}, GREEN);
-        DrawRectanglePro(Rectangle{200, 200, 100, 100}, Vector2{50, 50}, rotation, GREEN);
+        frame = frame % scarfy_max_frames;
+        printf("%d\n",frame);
 
-        DrawRectangleLinesEx(Rectangle{400, 200, 100, 100}, 25, BLACK);
+        DrawTextureRec(scarfy,
+                       Rectangle{(scarfy_frame_width * frame),
+                                 0, scarfy_frame_width,
+                                 (float)scarfy.height},
+                       Vector2{20, 20}, RAYWHITE);
 
-        DrawPoly(Vector2{500, 200}, sides % 12, 64, (rotation+rotation), BLUE);
-
-        Vector2 vertices[] = {Vector2{30, 0},    Vector2{0, 100},
-                              Vector2{100, 120}, Vector2{120, 50},
-                              Vector2{80, 20},   Vector2{150, 80}};
-
-        DrawTriangleFan(vertices, sizeof(vertices) / sizeof(vertices[0]), PURPLE);
         EndDrawing();
     }
 }
