@@ -11,33 +11,30 @@ int main()
 
     Texture2D scarfy = LoadTexture("../assets/scarfy.png");
 
-    float scarfy_frame_width = scarfy.width / 6;
-    float timer = 0.0f;
-
-    int frame = 0;
-    int scarfy_max_frames = (int)(scarfy.width / (int)scarfy_frame_width);
+    float x = 32.0f, y = 32.0f;
 
     while(!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        timer += GetFrameTime();
 
-        if(timer >= 0.2f)
+        if(IsGamepadAvailable(GAMEPAD_PLAYER1))
         {
-            timer = 0.0f;
-            frame++;
+            if(IsGamepadButtonPressed(GAMEPAD_PLAYER1, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))
+            {
+                x += 30.0f;
+            }
+
+            float left_joystick_x = GetGamepadAxisMovement(GAMEPAD_PLAYER1, GAMEPAD_AXIS_LEFT_X);
+
+            x += GetFrameTime() * 100.0f * left_joystick_x;
         }
 
-        frame = frame % scarfy_max_frames;
-        printf("%d\n",frame);
-
-        DrawTextureRec(scarfy,
-                       Rectangle{(scarfy_frame_width * frame),
-                                 0, scarfy_frame_width,
-                                 (float)scarfy.height},
-                       Vector2{20, 20}, RAYWHITE);
+        DrawTexturePro(scarfy,
+                       Rectangle{0, 0, 128, 128},
+                       Rectangle{x, y, 128, 128},
+                       Vector2{0, 0}, 0, RAYWHITE);
 
         EndDrawing();
     }
