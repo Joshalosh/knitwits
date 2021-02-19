@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <dirent.h>
 
+#define BUFFER_LENGTH 100
+
 int main()
 {
     int window_width  = 1920;
@@ -15,6 +17,8 @@ int main()
     Texture2D eyes = LoadTexture("../assets/eyes1.png");
     Texture2D hat = LoadTexture("../assets/hat1.png");
 
+    char *buffer[BUFFER_LENGTH];
+
     //NOTE: Read all files in a directory
     {
         DIR *d;
@@ -23,11 +27,21 @@ int main()
 
         if(d)
         {
+            int index = 0;
             while((dir = readdir(d)) != NULL)
             {
-                printf("%s\n", dir->d_name);
+                buffer[index] = dir->d_name;
+                index++;
             }
             closedir(d);
+        }
+    }
+
+    for(int i = 0; i < 30; i++)
+    {
+        if(i != NULL)
+        {
+            printf("%s\n", buffer[i]);
         }
     }
 
