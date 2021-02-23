@@ -1,8 +1,7 @@
 #include "include/raylib.h"
-#include <stdio.h>
-#include <dirent.h>
-
-#define BUFFER_LENGTH 100
+#include "include/dirent.h"
+#include "stdio.h"
+//#include "windows.h"
 
 int main()
 {
@@ -15,35 +14,43 @@ int main()
 
     Texture2D face = LoadTexture("../assets/face1.png");
     Texture2D eyes = LoadTexture("../assets/eyes1.png");
-    Texture2D hat = LoadTexture("../assets/hat1.png");
+    Texture2D hat  = LoadTexture("../assets/hat1.png");
 
-    char *buffer[BUFFER_LENGTH];
 
     //NOTE: Read all files in a directory
+#if 0
+    WIN32_FIND_DATA data;
+    HANDLE hFind; 
+    LPCWSTR file = L"*.png";
+    hFind = FindFirstFile(file, &data);
+
+    if(hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            printf("%ls\n", data.cFileName);
+        }
+        while(FindNextFile(hFind, &data));
+        {
+            FindClose(hFind);
+        }
+    }
+#endif
+#if 1
     {
         DIR *d;
         struct dirent *dir;
         d = opendir("../assets");
-
         if(d)
         {
-            int index = 0;
             while((dir = readdir(d)) != NULL)
             {
-                buffer[index] = dir->d_name;
-                index++;
+                printf("%s\n", dir->d_name);
             }
             closedir(d);
         }
     }
-
-    for(int i = 0; i < 30; i++)
-    {
-        if(i != NULL)
-        {
-            printf("%s\n", buffer[i]);
-        }
-    }
+#endif
 
     while(!WindowShouldClose())
     {
