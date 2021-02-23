@@ -1,5 +1,6 @@
 @echo off
 
+ctime -begin generator.ctm
 
 set CompilerFlags= /Zi /MDd /FC /nologo
 REM set LinkerFlags=-subsystem:Console
@@ -35,3 +36,5 @@ cl %CompilerFlags% ^
     shell32.lib
 
 popd
+
+ctime -end generator.ctm
