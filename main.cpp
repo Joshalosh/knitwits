@@ -1,6 +1,8 @@
 #include "include/raylib.h"
 #include "include/dirent.h"
 #include "stdio.h"
+#include "stdlib.h"
+#include "time.h"
 //#include "windows.h"
 
 #define internal static 
@@ -29,6 +31,29 @@ internal int Directory_Count(char *filepath)
     }
 }
 
+internal char *Randomised_Asset(char *filepath, int max_assets)
+{
+    DIR *d;
+    struct dirent *dir;
+    int num_count = 0;
+    d = opendir(filepath);
+    int rand_num = (rand() % (max_assets - 1 + 1)) + 1;
+    char *random_asset;
+    if(d)
+    {
+        while((dir = readdir(d)) != NULL)
+        {
+            if(num_count == rand_num)
+            {
+               random_asset = dir->d_name;
+            }
+            num_count++;
+        }
+        closedir(d);
+        return random_asset;
+    }
+}
+
 
 int main()
 {
@@ -43,13 +68,19 @@ int main()
     Texture2D eyes = LoadTexture("../assets/eyes/eyes1.png");
     Texture2D hat  = LoadTexture("../assets/hat/hat1.png");
     
-    char *face_filepath("../assets/face");
-    char *eyes_filepath("../assets/eyes");
-    char *hat_filepath("../assets/hat");
+    char *face_filepath("../assets/face/");
+    char *eyes_filepath("../assets/eyes/");
+    char *hat_filepath("../assets/hat/");
 
     int max_faces = Directory_Count(face_filepath);
-    int max_eyes = Directory_Count(eyes_filepath);
-    int max_hats = Directory_Count(hat_filepath);
+    int max_eyes  = Directory_Count(eyes_filepath);
+    int max_hats  = Directory_Count(hat_filepath);
+
+    srand(time(0));
+
+    char *file = Randomised_Asset(face_filepath, max_faces);
+
+    printf("%s\n", file);
 
     //NOTE: Read all files in a directory
 #if 0
