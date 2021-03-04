@@ -9,10 +9,13 @@
 #define global_variable static
 #define local_persist static
 
+#define MAX_BUFFER 100
+
 internal int Directory_Count(char *filepath)
 {
     DIR *d;
     struct dirent *dir;
+    
     int file_count = 0;
     d = opendir(filepath);
     if(d)
@@ -22,7 +25,7 @@ internal int Directory_Count(char *filepath)
             file_count++;
         }
         closedir(d);
-        file_count -= 2;
+        file_count -= 1;
         return file_count;
     }
     else
@@ -35,17 +38,21 @@ internal char *Randomised_Asset(char *filepath, int max_assets)
 {
     DIR *d;
     struct dirent *dir;
+
     int num_count = 0;
+    int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
+
+    char *random_asset = (char *)malloc(MAX_BUFFER);
+    memset(random_asset, 0, MAX_BUFFER);
+
     d = opendir(filepath);
-    int rand_num = (rand() % (max_assets - 1 + 1)) + 1;
-    char *random_asset;
     if(d)
     {
         while((dir = readdir(d)) != NULL)
         {
             if(num_count == rand_num)
             {
-               random_asset = dir->d_name;
+               strcpy(random_asset, dir->d_name);
             }
             num_count++;
         }
@@ -81,6 +88,7 @@ int main()
     char *file = Randomised_Asset(face_filepath, max_faces);
 
     printf("%s\n", file);
+    free(file);
 
     //NOTE: Read all files in a directory
 #if 0
