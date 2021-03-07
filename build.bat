@@ -9,7 +9,7 @@ IF NOT EXIST build mkdir build
 
 pushd build
 
-cl /c /D PLATFORM_DESKTOP /I..\external\Raylib\external\glfw\include ^
+cl %CompilerFlags% /c /D PLATFORM_DESKTOP /I..\external\Raylib\external\glfw\include ^
     ..\external\Raylib\core.c ^
     ..\external\Raylib\models.c ^
     ..\external\Raylib\raudio.c ^

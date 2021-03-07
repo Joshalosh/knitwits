@@ -72,6 +72,10 @@ int main()
 
     srand(time(0));
 
+    bool first_time_load_texture = true;
+    Texture2D face = {};
+    Texture2D eyes = {};
+    Texture2D hat = {};
 
     while(!WindowShouldClose())
     {
@@ -81,8 +85,23 @@ int main()
         global_variable float delta_time = 0.0f;
         delta_time += GetFrameTime();
 
-        if(IsKeyDown(KEY_UP))
+        if(IsKeyDown(KEY_UP) || first_time_load_texture)
         {
+            if (first_time_load_texture)
+            {
+                // The first time we load a texture, face, eyes and hat haven't
+                // been set yet so no need to unload any textures.
+                first_time_load_texture = false;
+            }
+            else
+            {
+                // NOTE: Make sure to clean up the old texture since we're going
+                // to load a new one in.
+                UnloadTexture(face);
+                UnloadTexture(eyes);
+                UnloadTexture(hat);
+            }
+
             char face_filepath[MAX_BUFFER] = "../assets/face/";
             char eyes_filepath[MAX_BUFFER] = "../assets/eyes/";
             char hat_filepath[MAX_BUFFER]  = "../assets/hat/";
@@ -103,15 +122,14 @@ int main()
             free(eyes_asset);
             free(hat_asset);
 
-            Texture2D face = LoadTexture(face_filepath);
-            Texture2D eyes = LoadTexture(eyes_filepath);
-            Texture2D hat  = LoadTexture(hat_filepath);
-
-            DrawTexture(face, 0, 0, RAYWHITE);
-            DrawTexture(eyes, 0, 0, RAYWHITE);
-            DrawTexture(hat, 0, 0, RAYWHITE);
+            face = LoadTexture(face_filepath);
+            eyes = LoadTexture(eyes_filepath);
+            hat  = LoadTexture(hat_filepath);
         }
 
+        DrawTexture(face, 0, 0, RAYWHITE);
+        DrawTexture(eyes, 0, 0, RAYWHITE);
+        DrawTexture(hat, 0, 0, RAYWHITE);
         EndDrawing();
     }
 }
