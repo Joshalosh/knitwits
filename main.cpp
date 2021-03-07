@@ -3,7 +3,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "time.h"
-//#include "windows.h"
+#include "string.h"
 
 #define internal static 
 #define global_variable static
@@ -70,53 +70,47 @@ int main()
     InitWindow(window_width, window_height, "MyGame");
     SetTargetFPS(60);
 
-
-    Texture2D face = LoadTexture("../assets/face/face1.png");
-    Texture2D eyes = LoadTexture("../assets/eyes/eyes1.png");
-    Texture2D hat  = LoadTexture("../assets/hat/hat1.png");
-    
-    char *face_filepath("../assets/face/");
-    char *eyes_filepath("../assets/eyes/");
-    char *hat_filepath("../assets/hat/");
-
-    int max_faces = Directory_Count(face_filepath);
-    int max_eyes  = Directory_Count(eyes_filepath);
-    int max_hats  = Directory_Count(hat_filepath);
-
     srand(time(0));
 
-    char *file = Randomised_Asset(face_filepath, max_faces);
 
-    printf("%s\n", file);
-    free(file);
-
-    //NOTE: Read all files in a directory
-#if 0
-    WIN32_FIND_DATA data;
-    HANDLE hFind; 
-    LPCWSTR file = L"*.png";
-    hFind = FindFirstFile(file, &data);
-
-    if(hFind != INVALID_HANDLE_VALUE)
-    {
-        do
-        {
-            printf("%ls\n", data.cFileName);
-        }
-        while(FindNextFile(hFind, &data));
-        {
-            FindClose(hFind);
-        }
-    }
-#endif
     while(!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        DrawTexture(face, 0, 0, RAYWHITE);
-        DrawTexture(eyes, 0, 0, RAYWHITE);
-        DrawTexture(hat, 0, 0, RAYWHITE);
+        global_variable float delta_time = 0.0f;
+        delta_time += GetFrameTime();
+
+        if(IsKeyDown(KEY_UP))
+        {
+            char face_filepath[MAX_BUFFER] = "../assets/face/";
+            char eyes_filepath[MAX_BUFFER] = "../assets/eyes/";
+            char hat_filepath[MAX_BUFFER]  = "../assets/hat/";
+
+            int max_faces = Directory_Count(face_filepath);
+            int max_eyes  = Directory_Count(eyes_filepath);
+            int max_hats  = Directory_Count(hat_filepath);
+
+            char *face_asset = Randomised_Asset(face_filepath, max_faces);
+            char *eyes_asset = Randomised_Asset(eyes_filepath, max_eyes);
+            char *hat_asset  = Randomised_Asset(hat_filepath, max_hats);
+
+            strcat(face_filepath, face_asset);
+            strcat(eyes_filepath, eyes_asset);
+            strcat(hat_filepath, hat_asset);
+
+            free(face_asset);
+            free(eyes_asset);
+            free(hat_asset);
+
+            Texture2D face = LoadTexture(face_filepath);
+            Texture2D eyes = LoadTexture(eyes_filepath);
+            Texture2D hat  = LoadTexture(hat_filepath);
+
+            DrawTexture(face, 0, 0, RAYWHITE);
+            DrawTexture(eyes, 0, 0, RAYWHITE);
+            DrawTexture(hat, 0, 0, RAYWHITE);
+        }
 
         EndDrawing();
     }
