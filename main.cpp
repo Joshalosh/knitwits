@@ -82,12 +82,9 @@ int main()
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        global_variable float delta_time = 0.0f;
-        delta_time += GetFrameTime();
-
         if(IsKeyDown(KEY_UP) || first_time_load_texture)
         {
-            if (first_time_load_texture)
+            if(first_time_load_texture)
             {
                 // The first time we load a texture, face, eyes and hat haven't
                 // been set yet so no need to unload any textures.
