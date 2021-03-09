@@ -126,7 +126,22 @@ int main()
 
         DrawTexture(face, 0, 0, RAYWHITE);
         DrawTexture(eyes, 0, 0, RAYWHITE);
-        DrawTexture(hat, 0, 0, RAYWHITE);
+        DrawTexture(hat,  0, 0, RAYWHITE);
         EndDrawing();
+
+        if(IsKeyDown(KEY_DOWN))
+        {
+            Image gen = GetScreenData();
+            bool did_it_work = ExportImage(gen, "../assets/exports/gen.png");
+
+            if(did_it_work)
+            {
+                printf("Success\n");
+            }
+            else
+            {
+                printf("You Suck Dipshit\n");
+            }
+        }
     }
 }
