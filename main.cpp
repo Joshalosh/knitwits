@@ -77,28 +77,30 @@ int main()
     Texture2D eyes = {};
     Texture2D hat = {};
 
+    int export_count = 1;
+
     while(!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        if(IsKeyDown(KEY_UP) || first_time_load_texture)
+        if(first_time_load_texture)
         {
-            if(first_time_load_texture)
-            {
-                // The first time we load a texture, face, eyes and hat haven't
-                // been set yet so no need to unload any textures.
-                first_time_load_texture = false;
-            }
-            else
-            {
-                // NOTE: Make sure to clean up the old texture since we're going
-                // to load a new one in.
-                UnloadTexture(face);
-                UnloadTexture(eyes);
-                UnloadTexture(hat);
-            }
+            // NOTE: The first time we load a texture, face, eyes and hat haven't
+            // been set yet so no need to unload any textures.
+            first_time_load_texture = false;
+        }
+        else
+        {
+            // NOTE: Make sure to clean up the old texture since we're going
+            // to load a new one in.
+            UnloadTexture(face);
+            UnloadTexture(eyes);
+            UnloadTexture(hat);
+        }
 
+        // NOTE: Set up textures to draw
+        {
             char face_filepath[MAX_BUFFER] = "../assets/face/";
             char eyes_filepath[MAX_BUFFER] = "../assets/eyes/";
             char hat_filepath[MAX_BUFFER]  = "../assets/hat/";
@@ -129,19 +131,22 @@ int main()
         DrawTexture(hat,  0, 0, RAYWHITE);
         EndDrawing();
 
-        if(IsKeyDown(KEY_DOWN))
-        {
-            Image gen = GetScreenData();
-            bool did_it_work = ExportImage(gen, "../assets/exports/gen.png");
 
-            if(did_it_work)
+        // NOTE: Export some random pics
+        {
+            if(export_count < 10)
             {
-                printf("Success\n");
-            }
-            else
-            {
-                printf("You Suck Dipshit\n");
+                Image gen = GetScreenData();
+                char export_path[MAX_BUFFER] = "../assets/exports/";
+                char *file_type = ".png";
+                char file[10];
+                sprintf(file, "%d", export_count);
+                strcat(export_path, file);
+                strcat(export_path, file_type);
+                ExportImage(gen, export_path);
+                export_count++;
             }
         }
+
     }
 }
