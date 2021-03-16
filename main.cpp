@@ -34,13 +34,14 @@ internal int Directory_Count(char *filepath)
     }
 }
 
-internal char *Randomised_Asset(char *filepath, int max_assets)
+internal char *Randomised_Asset(int *asset_id, char *filepath, int max_assets)
 {
     DIR *d;
     struct dirent *dir;
 
     int num_count = 0;
     int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
+    *asset_id = rand_num;
 
     char *random_asset = (char *)malloc(MAX_BUFFER);
     memset(random_asset, 0, MAX_BUFFER);
@@ -61,6 +62,14 @@ internal char *Randomised_Asset(char *filepath, int max_assets)
     }
 }
 
+struct Combination
+{
+    int face;
+    int eyes;
+    int hat;
+    int id;
+};
+
 
 int main()
 {
@@ -78,6 +87,11 @@ int main()
     Texture2D hat = {};
 
     int export_count = 1;
+    //int combination_index = 0;
+
+    //bool unique_combination = false;
+
+    Combination combination = {};
 
     while(!WindowShouldClose())
     {
@@ -109,9 +123,9 @@ int main()
             int max_eyes  = Directory_Count(eyes_filepath);
             int max_hats  = Directory_Count(hat_filepath);
 
-            char *face_asset = Randomised_Asset(face_filepath, max_faces);
-            char *eyes_asset = Randomised_Asset(eyes_filepath, max_eyes);
-            char *hat_asset  = Randomised_Asset(hat_filepath, max_hats);
+            char *face_asset = Randomised_Asset(&combination.face, face_filepath, max_faces);
+            char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_filepath, max_eyes);
+            char *hat_asset  = Randomised_Asset(&combination.hat, hat_filepath, max_hats);
 
             strcat(face_filepath, face_asset);
             strcat(eyes_filepath, eyes_asset);
@@ -131,22 +145,24 @@ int main()
         DrawTexture(hat,  0, 0, RAYWHITE);
         EndDrawing();
 
+        printf("face =\t%d\neyes =\t%d\nhat =\t%d\n", combination.face, combination.eyes, combination.hat);
 
+
+#if 0
         // NOTE: Export some random pics
+        if(export_count < 10)
         {
-            if(export_count < 10)
-            {
-                Image gen = GetScreenData();
-                char export_path[MAX_BUFFER] = "../assets/exports/";
-                char *file_type = ".png";
-                char file[10];
-                sprintf(file, "%d", export_count);
-                strcat(export_path, file);
-                strcat(export_path, file_type);
-                ExportImage(gen, export_path);
-                export_count++;
-            }
+            Image gen = GetScreenData();
+            char export_path[MAX_BUFFER] = "../assets/exports/";
+            char *file_type = ".png";
+            char file[10];
+            sprintf(file, "%d", export_count);
+            strcat(export_path, file);
+            strcat(export_path, file_type);
+            ExportImage(gen, export_path);
+            export_count++;
         }
+#endif
 
     }
 }
