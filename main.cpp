@@ -84,60 +84,85 @@ int main()
     bool first_time_load_texture = true;
     Texture2D face = {};
     Texture2D eyes = {};
-    Texture2D hat = {};
+    Texture2D hat  = {};
 
-    int export_count = 1;
-    //int combination_index = 0;
+    int combination_index = 0;
+    int export_count      = 1;
 
-    //bool unique_combination = false;
 
-    Combination combination = {};
+    int unique_combinations[12] = {};
+    Combination combination     = {};
 
     while(!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        if(first_time_load_texture)
+        bool unique = false;
+        while(!unique)
         {
-            // NOTE: The first time we load a texture, face, eyes and hat haven't
-            // been set yet so no need to unload any textures.
-            first_time_load_texture = false;
-        }
-        else
-        {
-            // NOTE: Make sure to clean up the old texture since we're going
-            // to load a new one in.
-            UnloadTexture(face);
-            UnloadTexture(eyes);
-            UnloadTexture(hat);
-        }
+            if(first_time_load_texture)
+            {
+                // NOTE: The first time we load a texture, face, eyes and hat haven't
+                // been set yet so no need to unload any textures.
+                first_time_load_texture = false;
+            }
+            else
+            {
+                // NOTE: Make sure to clean up the old texture since we're going
+                // to load a new one in.
+                UnloadTexture(face);
+                UnloadTexture(eyes);
+                UnloadTexture(hat);
+            }
 
-        // NOTE: Set up textures to draw
-        {
-            char face_filepath[MAX_BUFFER] = "../assets/face/";
-            char eyes_filepath[MAX_BUFFER] = "../assets/eyes/";
-            char hat_filepath[MAX_BUFFER]  = "../assets/hat/";
+            // NOTE: Set up the textures to draw.
+            {
+                char face_filepath[MAX_BUFFER] = "../assets/face/";
+                char eyes_filepath[MAX_BUFFER] = "../assets/eyes/";
+                char hat_filepath[MAX_BUFFER]  = "../assets/hat/";
 
-            int max_faces = Directory_Count(face_filepath);
-            int max_eyes  = Directory_Count(eyes_filepath);
-            int max_hats  = Directory_Count(hat_filepath);
+                int max_faces = Directory_Count(face_filepath);
+                int max_eyes  = Directory_Count(eyes_filepath);
+                int max_hats  = Directory_Count(hat_filepath);
 
-            char *face_asset = Randomised_Asset(&combination.face, face_filepath, max_faces);
-            char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_filepath, max_eyes);
-            char *hat_asset  = Randomised_Asset(&combination.hat, hat_filepath, max_hats);
+                char *face_asset = Randomised_Asset(&combination.face, face_filepath, max_faces);
+                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_filepath, max_eyes);
+                char *hat_asset  = Randomised_Asset(&combination.hat, hat_filepath, max_hats);
 
-            strcat(face_filepath, face_asset);
-            strcat(eyes_filepath, eyes_asset);
-            strcat(hat_filepath, hat_asset);
+                strcat(face_filepath, face_asset);
+                strcat(eyes_filepath, eyes_asset);
+                strcat(hat_filepath, hat_asset);
 
-            free(face_asset);
-            free(eyes_asset);
-            free(hat_asset);
+                free(face_asset);
+                free(eyes_asset);
+                free(hat_asset);
 
-            face = LoadTexture(face_filepath);
-            eyes = LoadTexture(eyes_filepath);
-            hat  = LoadTexture(hat_filepath);
+                face = LoadTexture(face_filepath);
+                eyes = LoadTexture(eyes_filepath);
+                hat  = LoadTexture(hat_filepath);
+            }
+
+            // NOTE: Check the overall asset for uniqueness.
+            combination.id = combination.hat + (combination.eyes*10) + (combination.face*100);
+            for(int array_index = 0; array_index < export_count; array_index++)
+            {
+                if(combination.id == unique_combinations[array_index])
+                {
+                    unique = false;
+                    break;
+                }
+                else
+                {
+                    unique = true;
+                }
+            }
+
+            if(unique)
+            {
+                unique_combinations[combination_index] = combination.id;
+                combination_index++;
+            }
         }
 
         DrawTexture(face, 0, 0, RAYWHITE);
@@ -145,12 +170,16 @@ int main()
         DrawTexture(hat,  0, 0, RAYWHITE);
         EndDrawing();
 
-        printf("face =\t%d\neyes =\t%d\nhat =\t%d\n", combination.face, combination.eyes, combination.hat);
+        // NOTE: Print to console for debugging.
+        {
+            printf("face =\t%d\neyes =\t%d\nhat =\t%d\nid =\t%d\n", combination.face, combination.eyes,
+                                                                    combination.hat, combination.id);
+        }
 
 
-#if 0
-        // NOTE: Export some random pics
-        if(export_count < 10)
+#if 1
+        // NOTE: Export some random pics.
+        if(export_count < 12)
         {
             Image gen = GetScreenData();
             char export_path[MAX_BUFFER] = "../assets/exports/";
@@ -163,6 +192,14 @@ int main()
             export_count++;
         }
 #endif
-
+        // NOTE: Print array of unique combinations for debugging.
+        if(export_count >= 10)
+        {
+            for(int i = 0; i < export_count; i++)
+            {
+                printf("%d\t--->\t%d\n", i, unique_combinations[i]);
+            }
+        }
+        
     }
 }
