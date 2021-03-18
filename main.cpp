@@ -90,8 +90,9 @@ int main()
     int export_count      = 1;
 
 
-    int unique_combinations[12] = {};
-    Combination combination     = {};
+    int unique_combinations[MAX_BUFFER] = {};
+
+    Combination combination = {};
 
     while(!WindowShouldClose())
     {
@@ -179,7 +180,7 @@ int main()
 
 #if 1
         // NOTE: Export some random pics.
-        if(export_count < 12)
+        if(export_count < MAX_BUFFER)
         {
             Image gen = GetScreenData();
             char export_path[MAX_BUFFER] = "../assets/exports/";
@@ -193,7 +194,7 @@ int main()
         }
 #endif
         // NOTE: Print array of unique combinations for debugging.
-        if(export_count >= 10)
+        if(export_count >= MAX_BUFFER)
         {
             for(int i = 0; i < export_count; i++)
             {
