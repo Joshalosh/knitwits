@@ -34,14 +34,36 @@ internal int Directory_Count(char *filepath)
     }
 }
 
-internal char *Randomised_Asset(int *asset_id, char *filepath, int max_assets)
+internal char *Randomised_Asset(int *asset_id, char *filepath, int max_assets, int *allowed_count)
 {
     DIR *d;
     struct dirent *dir;
 
     int num_count = 0;
-    int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
-    *asset_id = rand_num;
+    bool allowed = false;
+
+    while(!allowed)
+    {
+        int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
+
+        if(rand_num == 5 && *allowed_count >= 5)
+        {
+            allowed = true;
+            *allowed_count = 0;
+            *asset_id = rand_num;
+        }
+        else if(rand_num == 5 && *allowed_count != 5)
+        {
+            allowed = false;
+            *allowed_count++;
+        }
+        else
+        {
+            allowed = true;
+            *asset_id = rand_num;
+        }
+    }
+
 
     char *random_asset = (char *)malloc(MAX_BUFFER);
     memset(random_asset, 0, MAX_BUFFER);
@@ -51,7 +73,7 @@ internal char *Randomised_Asset(int *asset_id, char *filepath, int max_assets)
     {
         while((dir = readdir(d)) != NULL)
         {
-            if(num_count == rand_num)
+            if(num_count == *asset_id)
             {
                strcpy(random_asset, dir->d_name);
             }
@@ -88,6 +110,7 @@ int main()
 
     int combination_index = 0;
     int export_count      = 1;
+    int allowed_count     = 0;
 
 
     int unique_combinations[MAX_BUFFER] = {};
@@ -127,9 +150,9 @@ int main()
                 int max_eyes  = Directory_Count(eyes_filepath);
                 int max_hats  = Directory_Count(hat_filepath);
 
-                char *face_asset = Randomised_Asset(&combination.face, face_filepath, max_faces);
-                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_filepath, max_eyes);
-                char *hat_asset  = Randomised_Asset(&combination.hat, hat_filepath, max_hats);
+                char *face_asset = Randomised_Asset(&combination.face, face_filepath, max_faces, &allowed_count);
+                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_filepath, max_eyes, &allowed_count);
+                char *hat_asset  = Randomised_Asset(&combination.hat, hat_filepath, max_hats, &allowed_count);
 
                 strcat(face_filepath, face_asset);
                 strcat(eyes_filepath, eyes_asset);
