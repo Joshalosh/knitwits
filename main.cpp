@@ -42,6 +42,11 @@ internal char *Randomised_Asset(int *asset_id, char *filepath, int max_assets, i
     int num_count = 0;
     bool allowed = false;
 
+    // This is a way to decrease percentage chance but it would probably
+    // be better to do two random checks. The first check can be
+    // for overall rarity bucket e.g Common, Rare, Epic etc.
+    // The next check could be for the specific asset in the chosen
+    // rarity bucket. The rarity buckets should be based on percentages.
     while(!allowed)
     {
         int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
