@@ -34,29 +34,25 @@ internal int Directory_Count(char *filepath)
     }
 }
 
-internal char *Choose_Rarity(char *filepath)
+internal void Choose_Rarity(char *filepath)
 {
     int rand_num = (rand() % (100 - 0 + 1)) + 0;
 
     if(rand_num == 0 || rand_num == 100)
     {
         strcat(filepath, "ultimate/");
-        return filepath;
     }
     else if(rand_num >= 91 && rand_num <= 99)
     {
         strcat(filepath, "epic/");
-        return filepath;
     }
     else if(rand_num >= 71 && rand_num <= 90)
     {
         strcat(filepath, "rare/");
-        return filepath;
     }
     else
     {
         strcat(filepath, "common/");
-        return filepath;
     }
 }
 
@@ -181,25 +177,25 @@ int main()
                 char eyes_filepath[MAX_BUFFER] = "../assets/eyes/";
                 char hat_filepath[MAX_BUFFER]  = "../assets/hat/";
 
-                char *face_rarity = Choose_Rarity(face_filepath);
-                char *eyes_rarity = Choose_Rarity(eyes_filepath);
-                char *hat_rarity  = Choose_Rarity(hat_filepath);
+                Choose_Rarity(face_filepath);
+                Choose_Rarity(eyes_filepath);
+                Choose_Rarity(hat_filepath);
 
-                char *face_asset = Randomised_Asset(&combination.face, face_rarity);
-                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_rarity);
-                char *hat_asset  = Randomised_Asset(&combination.hat, hat_rarity);
+                char *face_asset = Randomised_Asset(&combination.face, face_filepath);
+                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_filepath);
+                char *hat_asset  = Randomised_Asset(&combination.hat, hat_filepath);
 
-                strcat(face_rarity, face_asset);
-                strcat(eyes_rarity, eyes_asset);
-                strcat(hat_rarity, hat_asset);
+                strcat(face_filepath, face_asset);
+                strcat(eyes_filepath, eyes_asset);
+                strcat(hat_filepath, hat_asset);
 
                 free(face_asset);
                 free(eyes_asset);
                 free(hat_asset);
 
-                face = LoadTexture(face_rarity);
-                eyes = LoadTexture(eyes_rarity);
-                hat  = LoadTexture(hat_rarity);
+                face = LoadTexture(face_filepath);
+                eyes = LoadTexture(eyes_filepath);
+                hat  = LoadTexture(hat_filepath);
             }
 
             // Check the overall asset for uniqueness.
