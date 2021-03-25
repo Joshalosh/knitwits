@@ -34,19 +34,47 @@ internal int Directory_Count(char *filepath)
     }
 }
 
-internal char *Randomised_Asset(int *asset_id, char *filepath, int max_assets, int *allowed_count)
+internal char *Choose_Rarity(char *filepath)
+{
+    int rand_num = (rand() % (100 - 0 + 1)) + 0;
+
+    if(rand_num == 0 || rand_num == 100)
+    {
+        strcat(filepath, "ultimate/");
+        return filepath;
+    }
+    else if(rand_num >= 91 && rand_num <= 99)
+    {
+        strcat(filepath, "epic/");
+        return filepath;
+    }
+    else if(rand_num >= 71 && rand_num <= 90)
+    {
+        strcat(filepath, "rare/");
+        return filepath;
+    }
+    else
+    {
+        strcat(filepath, "common/");
+        return filepath;
+    }
+}
+
+internal char *Randomised_Asset(int *asset_id, char *filepath)
 {
     DIR *d;
     struct dirent *dir;
 
     int num_count = 0;
-    bool allowed = false;
+    int max_assets = Directory_Count(filepath);
+    //bool allowed = false;
 
     // This is a way to decrease percentage chance but it would probably
     // be better to do two random checks. The first check can be
     // for overall rarity bucket e.g Common, Rare, Epic etc.
     // The next check could be for the specific asset in the chosen
     // rarity bucket. The rarity buckets should be based on percentages.
+#if 0
     while(!allowed)
     {
         int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
@@ -68,7 +96,9 @@ internal char *Randomised_Asset(int *asset_id, char *filepath, int max_assets, i
             *asset_id = rand_num;
         }
     }
-
+#endif
+    int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
+    *asset_id = rand_num;
 
     char *random_asset = (char *)malloc(MAX_BUFFER);
     memset(random_asset, 0, MAX_BUFFER);
@@ -115,7 +145,7 @@ int main()
 
     int combination_index = 0;
     int export_count      = 1;
-    int allowed_count     = 0;
+    // int allowed_count     = 0;
 
 
     int unique_combinations[MAX_BUFFER] = {};
@@ -132,47 +162,51 @@ int main()
         {
             if(first_time_load_texture)
             {
-                // NOTE: The first time we load a texture, face, eyes and hat haven't
+                // The first time we load a texture, face, eyes and hat haven't
                 // been set yet so no need to unload any textures.
                 first_time_load_texture = false;
             }
             else
             {
-                // NOTE: Make sure to clean up the old texture since we're going
+                // Make sure to clean up the old texture since we're going
                 // to load a new one in.
                 UnloadTexture(face);
                 UnloadTexture(eyes);
                 UnloadTexture(hat);
             }
 
-            // NOTE: Set up the textures to draw.
+            // Set up the textures to draw.
             {
                 char face_filepath[MAX_BUFFER] = "../assets/face/";
                 char eyes_filepath[MAX_BUFFER] = "../assets/eyes/";
                 char hat_filepath[MAX_BUFFER]  = "../assets/hat/";
 
-                int max_faces = Directory_Count(face_filepath);
-                int max_eyes  = Directory_Count(eyes_filepath);
-                int max_hats  = Directory_Count(hat_filepath);
+                char *face_rarity = Choose_Rarity(face_filepath);
+                char *eyes_rarity = Choose_Rarity(eyes_filepath);
+                char *hat_rarity  = Choose_Rarity(hat_filepath);
 
-                char *face_asset = Randomised_Asset(&combination.face, face_filepath, max_faces, &allowed_count);
-                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_filepath, max_eyes, &allowed_count);
-                char *hat_asset  = Randomised_Asset(&combination.hat, hat_filepath, max_hats, &allowed_count);
+                char *face_asset = Randomised_Asset(&combination.face, face_rarity);
+                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_rarity);
+                char *hat_asset  = Randomised_Asset(&combination.hat, hat_rarity);
 
-                strcat(face_filepath, face_asset);
-                strcat(eyes_filepath, eyes_asset);
-                strcat(hat_filepath, hat_asset);
+                strcat(face_rarity, face_asset);
+                strcat(eyes_rarity, eyes_asset);
+                strcat(hat_rarity, hat_asset);
 
                 free(face_asset);
                 free(eyes_asset);
                 free(hat_asset);
 
-                face = LoadTexture(face_filepath);
-                eyes = LoadTexture(eyes_filepath);
-                hat  = LoadTexture(hat_filepath);
+                face = LoadTexture(face_rarity);
+                eyes = LoadTexture(eyes_rarity);
+                hat  = LoadTexture(hat_rarity);
             }
 
-            // NOTE: Check the overall asset for uniqueness.
+            // Check the overall asset for uniqueness.
+
+            // TODO: Going to have to change the way I track individual assets
+            // and overall asset id's now that I have changed the way that
+            // rarity works.
             combination.id = combination.hat + (combination.eyes*10) + (combination.face*100);
             for(int array_index = 0; array_index < export_count; array_index++)
             {
@@ -199,19 +233,19 @@ int main()
         DrawTexture(hat,  0, 0, RAYWHITE);
         EndDrawing();
 
-        // NOTE: Print to console for debugging.
+        // Print to console for debugging.
         {
             printf("face =\t%d\neyes =\t%d\nhat =\t%d\nid =\t%d\n", combination.face, combination.eyes,
                                                                     combination.hat, combination.id);
         }
 
 
-#if 1
-        // NOTE: Export some random pics.
+#if 0
+        // Export some random pics.
         if(export_count < MAX_BUFFER)
         {
             Image gen = GetScreenData();
-            char export_path[MAX_BUFFER] = "../assets/exports/";
+            char export_path[MAX_BUFFER] = "../../assets/exports/";
             char *file_type = ".png";
             char file[10];
             sprintf(file, "%d", export_count);
@@ -221,14 +255,10 @@ int main()
             export_count++;
         }
 #endif
-        // NOTE: Print array of unique combinations for debugging.
-        if(export_count >= MAX_BUFFER)
+        // Print array of unique combinations for debugging.
+        for(int i = 0; i < combination_index; i++)
         {
-            for(int i = 0; i < export_count; i++)
-            {
-                printf("%d\t--->\t%d\n", i, unique_combinations[i]);
-            }
+            printf("%d\t--->\t%d\n", i, unique_combinations[i]);
         }
-        
     }
 }
