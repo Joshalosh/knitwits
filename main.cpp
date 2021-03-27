@@ -34,29 +34,34 @@ internal int Directory_Count(char *filepath)
     }
 }
 
-internal void Choose_Rarity(char *filepath)
+internal void Choose_Rarity(int *rarity_multiplyer, char *filepath )
 {
     int rand_num = (rand() % (100 - 0 + 1)) + 0;
+    *rarity_multiplyer = 0;
 
     if(rand_num == 0 || rand_num == 100)
     {
         strcat(filepath, "ultimate/");
+        *rarity_multiplyer = 40;
     }
     else if(rand_num >= 91 && rand_num <= 99)
     {
         strcat(filepath, "epic/");
+        *rarity_multiplyer = 30;
     }
     else if(rand_num >= 71 && rand_num <= 90)
     {
         strcat(filepath, "rare/");
+        *rarity_multiplyer = 20;
     }
     else
     {
         strcat(filepath, "common/");
+        *rarity_multiplyer = 10;
     }
 }
 
-internal char *Randomised_Asset(int *asset_id, char *filepath)
+internal char *Randomised_Asset(int *asset_id, int rarity_multiplyer, char *filepath)
 {
     DIR *d;
     struct dirent *dir;
@@ -94,7 +99,7 @@ internal char *Randomised_Asset(int *asset_id, char *filepath)
     }
 #endif
     int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
-    *asset_id = rand_num;
+    *asset_id = rand_num + rarity_multiplyer;
 
     char *random_asset = (char *)malloc(MAX_BUFFER);
     memset(random_asset, 0, MAX_BUFFER);
@@ -104,7 +109,7 @@ internal char *Randomised_Asset(int *asset_id, char *filepath)
     {
         while((dir = readdir(d)) != NULL)
         {
-            if(num_count == *asset_id)
+            if(num_count == rand_num)
             {
                strcpy(random_asset, dir->d_name);
             }
@@ -177,13 +182,14 @@ int main()
                 char eyes_filepath[MAX_BUFFER] = "../assets/eyes/";
                 char hat_filepath[MAX_BUFFER]  = "../assets/hat/";
 
-                Choose_Rarity(face_filepath);
-                Choose_Rarity(eyes_filepath);
-                Choose_Rarity(hat_filepath);
+                int rarity = 0;
+                Choose_Rarity(&rarity, face_filepath);
+                Choose_Rarity(&rarity, eyes_filepath);
+                Choose_Rarity(&rarity, hat_filepath);
 
-                char *face_asset = Randomised_Asset(&combination.face, face_filepath);
-                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_filepath);
-                char *hat_asset  = Randomised_Asset(&combination.hat, hat_filepath);
+                char *face_asset = Randomised_Asset(&combination.face, rarity, face_filepath);
+                char *eyes_asset = Randomised_Asset(&combination.eyes, rarity, eyes_filepath);
+                char *hat_asset  = Randomised_Asset(&combination.hat, rarity, hat_filepath);
 
                 strcat(face_filepath, face_asset);
                 strcat(eyes_filepath, eyes_asset);
