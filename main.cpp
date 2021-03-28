@@ -34,34 +34,34 @@ internal int Directory_Count(char *filepath)
     }
 }
 
-internal void Choose_Rarity(int *rarity_multiplyer, char *filepath )
+internal void Choose_Rarity(int *rarity_group, char *filepath )
 {
     int rand_num = (rand() % (100 - 0 + 1)) + 0;
-    *rarity_multiplyer = 0;
+    *rarity_group = 0;
 
     if(rand_num == 0 || rand_num == 100)
     {
         strcat(filepath, "ultimate/");
-        *rarity_multiplyer = 40;
+        *rarity_group = 40;
     }
     else if(rand_num >= 91 && rand_num <= 99)
     {
         strcat(filepath, "epic/");
-        *rarity_multiplyer = 30;
+        *rarity_group = 30;
     }
     else if(rand_num >= 71 && rand_num <= 90)
     {
         strcat(filepath, "rare/");
-        *rarity_multiplyer = 20;
+        *rarity_group = 20;
     }
     else
     {
         strcat(filepath, "common/");
-        *rarity_multiplyer = 10;
+        *rarity_group = 10;
     }
 }
 
-internal char *Randomised_Asset(int *asset_id, int rarity_multiplyer, char *filepath)
+internal char *Randomised_Asset(int *asset_id, int rarity_group, char *filepath)
 {
     DIR *d;
     struct dirent *dir;
@@ -70,7 +70,7 @@ internal char *Randomised_Asset(int *asset_id, int rarity_multiplyer, char *file
     int max_assets = Directory_Count(filepath);
 
     int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
-    *asset_id = rand_num + rarity_multiplyer;
+    *asset_id = rand_num + rarity_group;
 
     char *random_asset = (char *)malloc(MAX_BUFFER);
     memset(random_asset, 0, MAX_BUFFER);
@@ -116,8 +116,8 @@ int main()
     Texture2D hat  = {};
 
     int export_count = 1;
-    int combo_index  = 0;
     int combo_count  = 1;
+    int combo_index  = 0;
 
 
     int unique_combinations[MAX_BUFFER] = {};
@@ -146,7 +146,7 @@ int main()
                 UnloadTexture(hat);
             }
 
-            // Set up the textures to draw.
+            // Prepare the textures for drawing to the screen.
             {
                 char face_filepath[MAX_BUFFER] = "../assets/face/";
                 char eyes_filepath[MAX_BUFFER] = "../assets/eyes/";
@@ -157,7 +157,7 @@ int main()
                 int hat_rarity  = 0;
                 Choose_Rarity(&face_rarity, face_filepath);
                 Choose_Rarity(&eyes_rarity, eyes_filepath);
-                Choose_Rarity(&hat_rarity, hat_filepath);
+                Choose_Rarity(&hat_rarity,  hat_filepath);
 
                 char *face_asset = Randomised_Asset(&combination.face, face_rarity, face_filepath);
                 char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_rarity, eyes_filepath);
@@ -176,8 +176,8 @@ int main()
                 hat  = LoadTexture(hat_filepath);
             }
 
-            // Check the overall asset for uniqueness.
-
+            // Check the new asset combination for uniqueness in an array
+            // consisting of all the other assets that have been created.
             combination.id = combination.hat + (combination.eyes*100) + (combination.face*10000);
             for(int array_index = 0; array_index < combo_count; array_index++)
             {
