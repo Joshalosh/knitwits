@@ -66,38 +66,9 @@ internal char *Randomised_Asset(int *asset_id, int rarity_multiplyer, char *file
     DIR *d;
     struct dirent *dir;
 
-    int num_count = 0;
+    int num_count  = 0;
     int max_assets = Directory_Count(filepath);
-    //bool allowed = false;
 
-    // This is a way to decrease percentage chance but it would probably
-    // be better to do two random checks. The first check can be
-    // for overall rarity bucket e.g Common, Rare, Epic etc.
-    // The next check could be for the specific asset in the chosen
-    // rarity bucket. The rarity buckets should be based on percentages.
-#if 0
-    while(!allowed)
-    {
-        int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
-
-        if(rand_num == 5 && *allowed_count >= 5)
-        {
-            allowed = true;
-            *allowed_count = 0;
-            *asset_id = rand_num;
-        }
-        else if(rand_num == 5 && *allowed_count != 5)
-        {
-            allowed = false;
-            *allowed_count++;
-        }
-        else
-        {
-            allowed = true;
-            *asset_id = rand_num;
-        }
-    }
-#endif
     int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
     *asset_id = rand_num + rarity_multiplyer;
 
@@ -144,14 +115,12 @@ int main()
     Texture2D eyes = {};
     Texture2D hat  = {};
 
-    int combination_index = 0;
-    int export_count      = 1;
-    int allowed_combo     = 1;
-    // int allowed_count     = 0;
+    int export_count = 1;
+    int combo_index  = 0;
+    int combo_count  = 1;
 
 
     int unique_combinations[MAX_BUFFER] = {};
-
     Combination combination = {};
 
     while(!WindowShouldClose())
@@ -185,18 +154,18 @@ int main()
 
                 int face_rarity = 0;
                 int eyes_rarity = 0;
-                int hat_rarity = 0;
+                int hat_rarity  = 0;
                 Choose_Rarity(&face_rarity, face_filepath);
                 Choose_Rarity(&eyes_rarity, eyes_filepath);
                 Choose_Rarity(&hat_rarity, hat_filepath);
 
                 char *face_asset = Randomised_Asset(&combination.face, face_rarity, face_filepath);
                 char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_rarity, eyes_filepath);
-                char *hat_asset  = Randomised_Asset(&combination.hat, hat_rarity, hat_filepath);
+                char *hat_asset  = Randomised_Asset(&combination.hat,  hat_rarity,  hat_filepath);
 
                 strcat(face_filepath, face_asset);
                 strcat(eyes_filepath, eyes_asset);
-                strcat(hat_filepath, hat_asset);
+                strcat(hat_filepath,  hat_asset);
 
                 free(face_asset);
                 free(eyes_asset);
@@ -209,11 +178,8 @@ int main()
 
             // Check the overall asset for uniqueness.
 
-            // TODO: Going to have to change the way I track individual assets
-            // and overall asset id's now that I have changed the way that
-            // rarity works.
             combination.id = combination.hat + (combination.eyes*100) + (combination.face*10000);
-            for(int array_index = 0; array_index < allowed_combo; array_index++)
+            for(int array_index = 0; array_index < combo_count; array_index++)
             {
                 if(combination.id == unique_combinations[array_index])
                 {
@@ -228,9 +194,9 @@ int main()
 
             if(unique)
             {
-                unique_combinations[combination_index] = combination.id;
-                combination_index++;
-                allowed_combo++;
+                unique_combinations[combo_index] = combination.id;
+                combo_index++;
+                combo_count++;
             }
         }
 
@@ -242,7 +208,7 @@ int main()
         // Print to console for debugging.
         {
             printf("face =\t%d\neyes =\t%d\nhat =\t%d\nid =\t%d\n", combination.face, combination.eyes,
-                                                                    combination.hat, combination.id);
+                                                                    combination.hat,  combination.id);
         }
 
 
@@ -262,7 +228,7 @@ int main()
         }
 #endif
         // Print array of unique combinations for debugging.
-        for(int i = 0; i < combination_index; i++)
+        for(int i = 0; i < combo_index; i++)
         {
             printf("%d\t--->\t%d\n", i, unique_combinations[i]);
         }
