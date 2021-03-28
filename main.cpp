@@ -146,6 +146,7 @@ int main()
 
     int combination_index = 0;
     int export_count      = 1;
+    int allowed_combo     = 1;
     // int allowed_count     = 0;
 
 
@@ -182,14 +183,16 @@ int main()
                 char eyes_filepath[MAX_BUFFER] = "../assets/eyes/";
                 char hat_filepath[MAX_BUFFER]  = "../assets/hat/";
 
-                int rarity = 0;
-                Choose_Rarity(&rarity, face_filepath);
-                Choose_Rarity(&rarity, eyes_filepath);
-                Choose_Rarity(&rarity, hat_filepath);
+                int face_rarity = 0;
+                int eyes_rarity = 0;
+                int hat_rarity = 0;
+                Choose_Rarity(&face_rarity, face_filepath);
+                Choose_Rarity(&eyes_rarity, eyes_filepath);
+                Choose_Rarity(&hat_rarity, hat_filepath);
 
-                char *face_asset = Randomised_Asset(&combination.face, rarity, face_filepath);
-                char *eyes_asset = Randomised_Asset(&combination.eyes, rarity, eyes_filepath);
-                char *hat_asset  = Randomised_Asset(&combination.hat, rarity, hat_filepath);
+                char *face_asset = Randomised_Asset(&combination.face, face_rarity, face_filepath);
+                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_rarity, eyes_filepath);
+                char *hat_asset  = Randomised_Asset(&combination.hat, hat_rarity, hat_filepath);
 
                 strcat(face_filepath, face_asset);
                 strcat(eyes_filepath, eyes_asset);
@@ -209,8 +212,8 @@ int main()
             // TODO: Going to have to change the way I track individual assets
             // and overall asset id's now that I have changed the way that
             // rarity works.
-            combination.id = combination.hat + (combination.eyes*10) + (combination.face*100);
-            for(int array_index = 0; array_index < export_count; array_index++)
+            combination.id = combination.hat + (combination.eyes*100) + (combination.face*10000);
+            for(int array_index = 0; array_index < allowed_combo; array_index++)
             {
                 if(combination.id == unique_combinations[array_index])
                 {
@@ -227,6 +230,7 @@ int main()
             {
                 unique_combinations[combination_index] = combination.id;
                 combination_index++;
+                allowed_combo++;
             }
         }
 
