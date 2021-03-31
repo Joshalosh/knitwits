@@ -64,7 +64,7 @@ Choose_Rarity(int *rarity_group, char *filepath )
 }
 
 internal char 
-*Randomised_Asset(int *asset_id, int rarity_group, char *filepath, int asset_counter[MAX_BUFFER])
+*Randomised_Asset(int *asset_id, int rarity_group, char *filepath, int *asset_counter)
 {
     DIR *d;
     struct dirent *dir;
@@ -248,9 +248,11 @@ int main()
         }
 #endif
         // Print array of unique combinations for debugging.
+#if 0
         for(int i = 0; i < combo_index; i++)
         {
             printf("%d\t--->\t%d\n", i, unique_combinations[i]);
         }
+#endif
     }
 }
