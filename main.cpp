@@ -11,7 +11,8 @@
 
 #define MAX_BUFFER 100
 
-internal int Directory_Count(char *filepath)
+internal int
+Directory_Count(char *filepath)
 {
     DIR *d;
     struct dirent *dir;
@@ -34,7 +35,8 @@ internal int Directory_Count(char *filepath)
     }
 }
 
-internal void Choose_Rarity(int *rarity_group, char *filepath )
+internal void 
+Choose_Rarity(int *rarity_group, char *filepath )
 {
     int rand_num = (rand() % (100 - 0 + 1)) + 0;
     *rarity_group = 0;
@@ -61,7 +63,8 @@ internal void Choose_Rarity(int *rarity_group, char *filepath )
     }
 }
 
-internal char *Randomised_Asset(int *asset_id, int rarity_group, char *filepath)
+internal char 
+*Randomised_Asset(int *asset_id, int rarity_group, char *filepath, int asset_counter[MAX_BUFFER])
 {
     DIR *d;
     struct dirent *dir;
@@ -71,6 +74,7 @@ internal char *Randomised_Asset(int *asset_id, int rarity_group, char *filepath)
 
     int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
     *asset_id = rand_num + rarity_group;
+    asset_counter[*asset_id] += 1;
 
     char *random_asset = (char *)malloc(MAX_BUFFER);
     memset(random_asset, 0, MAX_BUFFER);
@@ -99,7 +103,6 @@ struct Combination
     int id;
 };
 
-
 int main()
 {
     int window_width  = 1920;
@@ -119,6 +122,10 @@ int main()
     int combo_count  = 1;
     int combo_index  = 0;
 
+
+    int face_asset_count[MAX_BUFFER] = {};
+    int eyes_asset_count[MAX_BUFFER] = {};
+    int hat_asset_count[MAX_BUFFER]  = {};
 
     int unique_combinations[MAX_BUFFER] = {};
     Combination combination = {};
@@ -159,9 +166,12 @@ int main()
                 Choose_Rarity(&eyes_rarity, eyes_filepath);
                 Choose_Rarity(&hat_rarity,  hat_filepath);
 
-                char *face_asset = Randomised_Asset(&combination.face, face_rarity, face_filepath);
-                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_rarity, eyes_filepath);
-                char *hat_asset  = Randomised_Asset(&combination.hat,  hat_rarity,  hat_filepath);
+                char *face_asset = Randomised_Asset(&combination.face, face_rarity,
+                                                    face_filepath, face_asset_count);
+                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_rarity, 
+                                                    eyes_filepath, eyes_asset_count);
+                char *hat_asset  = Randomised_Asset(&combination.hat, hat_rarity,
+                                                    hat_filepath, hat_asset_count);
 
                 strcat(face_filepath, face_asset);
                 strcat(eyes_filepath, eyes_asset);
@@ -206,10 +216,20 @@ int main()
         EndDrawing();
 
         // Print to console for debugging.
+#if 0
         {
             printf("face =\t%d\neyes =\t%d\nhat =\t%d\nid =\t%d\n", combination.face, combination.eyes,
                                                                     combination.hat,  combination.id);
         }
+#else
+        for(int i = 0; i < MAX_BUFFER; i++)
+        {
+            if(face_asset_count[i] != 0)
+            {
+                printf("%d\t--->\t%d\n", i, face_asset_count[i]);
+            }
+        }
+#endif
 
 
 #if 0
