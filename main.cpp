@@ -11,6 +11,25 @@
 
 #define MAX_BUFFER 100
 
+#if 0 
+struct pcg32_random_t
+{
+    uint64_t state;
+    uint64_t inc;
+};
+
+uint32_t pcg32_random_r(pcg32_random_t *rng)
+{
+    uint42_t old_state = rng->state;
+    // Advanced internal state
+    rng->state = old_state *6364136223846793005ULL + (rng->inc|1);
+    // Calculate output function (XSH RR), uses old state for max ILP
+    uint32_t xor_shifted = ((old_state >> 18u) ^ old_state) >>27u;
+    uint32_t rot = old_state >> 59u;
+    return (xor_shifted >> rot) | (xor_shifted << ((-rot) & 31));
+}
+#endif
+
 internal int
 Directory_Count(char *filepath)
 {
@@ -221,14 +240,6 @@ int main()
             printf("face =\t%d\neyes =\t%d\nhat =\t%d\nid =\t%d\n", combination.face, combination.eyes,
                                                                     combination.hat,  combination.id);
         }
-#else
-        for(int i = 0; i < MAX_BUFFER; i++)
-        {
-            if(face_asset_count[i] != 0)
-            {
-                printf("%d\t--->\t%d\n", i, face_asset_count[i]);
-            }
-        }
 #endif
 
 
@@ -254,5 +265,35 @@ int main()
             printf("%d\t--->\t%d\n", i, unique_combinations[i]);
         }
 #endif
+    }
+
+    // Print the asset count for each individual asset.
+    {
+        printf("FACE:\n");
+        for(int i = 0; i < MAX_BUFFER; i++)
+        {
+            if(face_asset_count[i] != 0)
+            {
+                printf("%d\t--->\t%d\n", i, face_asset_count[i]);
+            }
+        }
+
+        printf("EYES:\n");
+        for(int i = 0; i < MAX_BUFFER; i++)
+        {
+            if(eyes_asset_count[i] != 0)
+            {
+                printf("%d\t--->\t%d\n", i, eyes_asset_count[i]);
+            }
+        }
+
+        printf("HAT:\n");
+        for(int i = 0; i < MAX_BUFFER; i++)
+        {
+            if(hat_asset_count[i] != 0)
+            {
+                printf("%d\t--->\t%d\n", i, hat_asset_count[i]);
+            }
+        }
     }
 }
