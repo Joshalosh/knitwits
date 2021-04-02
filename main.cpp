@@ -12,12 +12,11 @@
 
 #define MAX_BUFFER 100
 
-#if 1 
-typedef struct 
+struct pcg32_random_t 
 {
     uint64_t state;
     uint64_t inc;
-}pcg32_random_t;
+};
 
 uint32_t pcg32_random_r(pcg32_random_t *rng)
 {
@@ -29,7 +28,6 @@ uint32_t pcg32_random_r(pcg32_random_t *rng)
     uint32_t rot = old_state >> 59u;
     return (xor_shifted >> rot) | (xor_shifted << ((-rot) & 31));
 }
-#endif
 
 internal int
 Directory_Count(char *filepath)
