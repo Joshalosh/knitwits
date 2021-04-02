@@ -4,6 +4,7 @@
 #include "stdlib.h"
 #include "time.h"
 #include "string.h"
+#include "stdint.h"
 
 #define internal static 
 #define global_variable static
@@ -11,16 +12,16 @@
 
 #define MAX_BUFFER 100
 
-#if 0 
-struct pcg32_random_t
+#if 1 
+typedef struct 
 {
     uint64_t state;
     uint64_t inc;
-};
+}pcg32_random_t;
 
 uint32_t pcg32_random_r(pcg32_random_t *rng)
 {
-    uint42_t old_state = rng->state;
+    uint64_t old_state = rng->state;
     // Advanced internal state
     rng->state = old_state *6364136223846793005ULL + (rng->inc|1);
     // Calculate output function (XSH RR), uses old state for max ILP
@@ -55,9 +56,9 @@ Directory_Count(char *filepath)
 }
 
 internal void 
-Choose_Rarity(int *rarity_group, char *filepath )
+Choose_Rarity(int *rarity_group, char *filepath, pcg32_random_t *rng)
 {
-    int rand_num = (rand() % (100 - 0 + 1)) + 0;
+    uint32_t rand_num = (pcg32_random_r(rng) % (100 - 0 + 1)) + 0;
     *rarity_group = 0;
 
     if(rand_num == 0 || rand_num == 100)
@@ -83,7 +84,8 @@ Choose_Rarity(int *rarity_group, char *filepath )
 }
 
 internal char 
-*Randomised_Asset(int *asset_id, int rarity_group, char *filepath, int *asset_counter)
+*Randomised_Asset(int *asset_id, int rarity_group, char *filepath,
+                  int *asset_counter, pcg32_random_t *rng)
 {
     DIR *d;
     struct dirent *dir;
@@ -91,7 +93,7 @@ internal char
     int num_count  = 0;
     int max_assets = Directory_Count(filepath);
 
-    int rand_num  = (rand() % (max_assets - 2 + 1)) + 2;
+    uint32_t rand_num  = (pcg32_random_r(rng) % (max_assets - 2 + 1)) + 2;
     *asset_id = rand_num + rarity_group;
     asset_counter[*asset_id] += 1;
 
@@ -130,7 +132,7 @@ int main()
     InitWindow(window_width, window_height, "MyGame");
     SetTargetFPS(60);
 
-    srand(time(0));
+    pcg32_random_t rng = {};
 
     bool first_time_load_texture = true;
     Texture2D face = {};
@@ -181,16 +183,16 @@ int main()
                 int face_rarity = 0;
                 int eyes_rarity = 0;
                 int hat_rarity  = 0;
-                Choose_Rarity(&face_rarity, face_filepath);
-                Choose_Rarity(&eyes_rarity, eyes_filepath);
-                Choose_Rarity(&hat_rarity,  hat_filepath);
+                Choose_Rarity(&face_rarity, face_filepath, &rng);
+                Choose_Rarity(&eyes_rarity, eyes_filepath, &rng);
+                Choose_Rarity(&hat_rarity,  hat_filepath,  &rng);
 
                 char *face_asset = Randomised_Asset(&combination.face, face_rarity,
-                                                    face_filepath, face_asset_count);
+                                                    face_filepath, face_asset_count, &rng);
                 char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_rarity, 
-                                                    eyes_filepath, eyes_asset_count);
+                                                    eyes_filepath, eyes_asset_count, &rng);
                 char *hat_asset  = Randomised_Asset(&combination.hat, hat_rarity,
-                                                    hat_filepath, hat_asset_count);
+                                                    hat_filepath, hat_asset_count, &rng);
 
                 strcat(face_filepath, face_asset);
                 strcat(eyes_filepath, eyes_asset);
