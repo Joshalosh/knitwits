@@ -12,6 +12,11 @@
 
 #define MAX_BUFFER 100
 
+struct Asset
+{
+    int counter[MAX_BUFFER];
+};
+
 struct pcg32_random_t 
 {
     uint64_t state;
@@ -83,7 +88,7 @@ Choose_Rarity(int *rarity_group, char *filepath, pcg32_random_t *rng)
 
 internal char 
 *Randomised_Asset(int *asset_id, int rarity_group, char *filepath,
-                  int *asset_counter, pcg32_random_t *rng)
+                  Asset *asset, pcg32_random_t *rng)
 {
     DIR *d;
     struct dirent *dir;
@@ -93,7 +98,7 @@ internal char
 
     uint32_t rand_num  = (pcg32_random_r(rng) % (max_assets - 2 + 1)) + 2;
     *asset_id = rand_num + rarity_group;
-    asset_counter[*asset_id] += 1;
+    asset->counter[*asset_id] += 1;
 
     char *random_asset = (char *)malloc(MAX_BUFFER);
     memset(random_asset, 0, MAX_BUFFER);
@@ -142,9 +147,9 @@ int main()
     int combo_index  = 0;
 
 
-    int face_asset_count[MAX_BUFFER] = {};
-    int eyes_asset_count[MAX_BUFFER] = {};
-    int hat_asset_count[MAX_BUFFER]  = {};
+    Asset face_asset = {};
+    Asset eyes_asset = {};
+    Asset hat_asset = {};
 
     int unique_combinations[MAX_BUFFER] = {};
     Combination combination = {};
@@ -185,20 +190,20 @@ int main()
                 Choose_Rarity(&eyes_rarity, eyes_filepath, &rng);
                 Choose_Rarity(&hat_rarity,  hat_filepath,  &rng);
 
-                char *face_asset = Randomised_Asset(&combination.face, face_rarity,
-                                                    face_filepath, face_asset_count, &rng);
-                char *eyes_asset = Randomised_Asset(&combination.eyes, eyes_rarity, 
-                                                    eyes_filepath, eyes_asset_count, &rng);
-                char *hat_asset  = Randomised_Asset(&combination.hat, hat_rarity,
-                                                    hat_filepath, hat_asset_count, &rng);
+                char *face_asset_path = Randomised_Asset(&combination.face, face_rarity,
+                                                    face_filepath, &face_asset, &rng);
+                char *eyes_asset_path = Randomised_Asset(&combination.eyes, eyes_rarity, 
+                                                    eyes_filepath, &eyes_asset, &rng);
+                char *hat_asset_path  = Randomised_Asset(&combination.hat, hat_rarity,
+                                                    hat_filepath, &hat_asset, &rng);
 
-                strcat(face_filepath, face_asset);
-                strcat(eyes_filepath, eyes_asset);
-                strcat(hat_filepath,  hat_asset);
+                strcat(face_filepath, face_asset_path);
+                strcat(eyes_filepath, eyes_asset_path);
+                strcat(hat_filepath,  hat_asset_path);
 
-                free(face_asset);
-                free(eyes_asset);
-                free(hat_asset);
+                free(face_asset_path);
+                free(eyes_asset_path);
+                free(hat_asset_path);
 
                 face = LoadTexture(face_filepath);
                 eyes = LoadTexture(eyes_filepath);
@@ -272,27 +277,27 @@ int main()
         printf("FACE:\n");
         for(int i = 0; i < MAX_BUFFER; i++)
         {
-            if(face_asset_count[i] != 0)
+            if(face_asset.counter[i] != 0)
             {
-                printf("%d\t--->\t%d\n", i, face_asset_count[i]);
+                printf("%d\t--->\t%d\n", i, face_asset.counter[i]);
             }
         }
 
         printf("EYES:\n");
         for(int i = 0; i < MAX_BUFFER; i++)
         {
-            if(eyes_asset_count[i] != 0)
+            if(eyes_asset.counter[i] != 0)
             {
-                printf("%d\t--->\t%d\n", i, eyes_asset_count[i]);
+                printf("%d\t--->\t%d\n", i, eyes_asset.counter[i]);
             }
         }
 
         printf("HAT:\n");
         for(int i = 0; i < MAX_BUFFER; i++)
         {
-            if(hat_asset_count[i] != 0)
+            if(hat_asset.counter[i] != 0)
             {
-                printf("%d\t--->\t%d\n", i, hat_asset_count[i]);
+                printf("%d\t--->\t%d\n", i, hat_asset.counter[i]);
             }
         }
     }
