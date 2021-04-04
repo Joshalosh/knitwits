@@ -5,23 +5,7 @@
 #include "time.h"
 #include "string.h"
 #include "stdint.h"
-
-#define internal static 
-#define global_variable static
-#define local_persist static
-
-#define MAX_BUFFER 100
-
-struct Asset
-{
-    int counter[MAX_BUFFER];
-};
-
-struct pcg32_random_t 
-{
-    uint64_t state;
-    uint64_t inc;
-};
+#include "main.h"
 
 uint32_t pcg32_random_r(pcg32_random_t *rng)
 {
@@ -118,14 +102,6 @@ internal char
         return random_asset;
     }
 }
-
-struct Combination
-{
-    int face;
-    int eyes;
-    int hat;
-    int id;
-};
 
 int main()
 {
