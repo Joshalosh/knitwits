@@ -136,7 +136,7 @@ int main()
         ClearBackground(RAYWHITE);
 
         bool unique = false;
-        while(!unique)
+        while(!unique && export_count < 100)
         {
             if(first_time_load_texture)
             {
@@ -214,6 +214,7 @@ int main()
         DrawTexture(eyes, 0, 0, RAYWHITE);
         DrawTexture(hat,  0, 0, RAYWHITE);
         EndDrawing();
+        export_count++;
 
         // Print to console for debugging.
 #if 0
@@ -251,29 +252,66 @@ int main()
     // Print the asset count for each individual asset.
     {
         printf("FACE:\n");
+        float total_assets = 0;
         for(int i = 0; i < MAX_BUFFER; i++)
         {
             if(face_asset.counter[i] != 0)
             {
+
+                total_assets += face_asset.counter[i];
                 printf("%d\t--->\t%d\n", i, face_asset.counter[i]);
+            }
+        }
+        printf("FACE PERCENTAGES:\n");
+        for(int i = 0; i < MAX_BUFFER; i++)
+        {
+            if(face_asset.counter[i] != 0)
+            {
+
+                int percentage = (face_asset.counter[i] / total_assets)*100;
+                printf("%d\t--->\t%d\n", i, percentage);
             }
         }
 
         printf("EYES:\n");
+        total_assets = 0;
         for(int i = 0; i < MAX_BUFFER; i++)
         {
             if(eyes_asset.counter[i] != 0)
             {
+                total_assets += eyes_asset.counter[i];
                 printf("%d\t--->\t%d\n", i, eyes_asset.counter[i]);
+            }
+        }
+        printf("EYES PERCENTAGES:\n");
+        for(int i = 0; i < MAX_BUFFER; i++)
+        {
+            if(eyes_asset.counter[i] != 0)
+            {
+
+                int percentage = (eyes_asset.counter[i] / total_assets)*100;
+                printf("%d\t--->\t%d\n", i, percentage);
             }
         }
 
         printf("HAT:\n");
+        total_assets = 0;
         for(int i = 0; i < MAX_BUFFER; i++)
         {
             if(hat_asset.counter[i] != 0)
             {
+                total_assets += hat_asset.counter[i];
                 printf("%d\t--->\t%d\n", i, hat_asset.counter[i]);
+            }
+        }
+        printf("HAT PERCENTAGES:\n");
+        for(int i = 0; i < MAX_BUFFER; i++)
+        {
+            if(hat_asset.counter[i] != 0)
+            {
+
+                int percentage = (hat_asset.counter[i] / total_assets)*100;
+                printf("%d\t--->\t%d\n", i, percentage);
             }
         }
     }
