@@ -253,25 +253,44 @@ int main()
     {
         printf("FACE:\n");
         float total_assets = 0;
+        int common_count   = 0;
+        int rare_count     = 0;
+        int epic_count     = 0;
+        int ultimate_count = 0;
         for(int i = 0; i < MAX_BUFFER; i++)
         {
             if(face_asset.counter[i] != 0)
             {
+                if(i >= 40)
+                {
+                    ultimate_count += face_asset.counter[i];
+                }
+                else if(i >= 30 && i <= 39)
+                {
+                    epic_count += face_asset.counter[i];
+                }
+                else if(i >= 20 && i <= 29)
+                {
+                    rare_count += face_asset.counter[i];
+                }
+                else
+                {
+                    common_count += face_asset.counter[i];
+                }
 
                 total_assets += face_asset.counter[i];
                 printf("%d\t--->\t%d\n", i, face_asset.counter[i]);
             }
         }
-        printf("FACE PERCENTAGES:\n");
-        for(int i = 0; i < MAX_BUFFER; i++)
-        {
-            if(face_asset.counter[i] != 0)
-            {
 
-                int percentage = (face_asset.counter[i] / total_assets)*100;
-                printf("%d\t--->\t%d\n", i, percentage);
-            }
-        }
+        printf("FACE PERCENTAGES:\n");
+        int common_percentage   = (common_count   / total_assets)*100;
+        int rare_percentage     = (rare_count     / total_assets)*100;
+        int epic_percentage     = (epic_count     / total_assets)*100;
+        int ultimate_percentage = (ultimate_count / total_assets)*100;
+
+        printf("Common\t\t--->\t%d\nRare\t\t--->\t%d\nEpic\t\t--->\t%d\nUltimate\t--->\t%d\n", common_percentage, rare_percentage,
+                                                                                         epic_percentage, ultimate_percentage);
 
         printf("EYES:\n");
         total_assets = 0;
