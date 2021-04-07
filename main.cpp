@@ -7,6 +7,8 @@
 #include "stdint.h"
 #include "main.h"
 
+// Using PCG for random number generation. Companion
+// struct in "main.h".
 uint32_t pcg32_random_r(pcg32_random_t *rng)
 {
     uint64_t old_state = rng->state;
@@ -18,6 +20,7 @@ uint32_t pcg32_random_r(pcg32_random_t *rng)
     return (xor_shifted >> rot) | (xor_shifted << ((-rot) & 31));
 }
 
+// Count the number of assets within a given directory.
 internal int
 Directory_Count(char *filepath)
 {
@@ -42,6 +45,9 @@ Directory_Count(char *filepath)
     }
 }
 
+// Assign a rarity "bucket", which in reality is
+// just a grouping of different directories
+// for the different types of rarities.
 internal void 
 Choose_Rarity(int *rarity_group, char *filepath, pcg32_random_t *rng)
 {
@@ -70,6 +76,8 @@ Choose_Rarity(int *rarity_group, char *filepath, pcg32_random_t *rng)
     }
 }
 
+// Choose an asset within a rarity bucket/directory
+// and record it's filepath.
 internal char 
 *Randomised_Asset(int *asset_id, int rarity_group, char *filepath,
                   Asset *asset, pcg32_random_t *rng)
@@ -103,6 +111,54 @@ internal char
     }
 }
 
+// Just a little function to help print some
+// statistics about the assets after creation.
+// for example how many times a particular asset
+// was used and it's overall percentage.
+internal void
+Print_Asset_Stats(Asset *asset)
+{
+    float total_assets = 0;
+    int common_count   = 0;
+    int rare_count     = 0;
+    int epic_count     = 0;
+    int ultimate_count = 0;
+    for(int i = 0; i < MAX_BUFFER; i++)
+    {
+        if(asset->counter[i] != 0)
+        {
+            if(i >= 40)
+            {
+                ultimate_count += asset->counter[i];
+            }
+            else if(i >= 30 && i <= 39)
+            {
+                epic_count += asset->counter[i];
+            }
+            else if(i >= 20 && i <= 29)
+            {
+                rare_count += asset->counter[i];
+            }
+            else
+            {
+                common_count += asset->counter[i];
+            }
+
+            total_assets += asset->counter[i];
+            printf("%d\t--->\t%d\n", i, asset->counter[i]);
+        }
+    }
+
+    printf("PERCENTAGES:\n");
+    int common_percentage   = (common_count   / total_assets)*100;
+    int rare_percentage     = (rare_count     / total_assets)*100;
+    int epic_percentage     = (epic_count     / total_assets)*100;
+    int ultimate_percentage = (ultimate_count / total_assets)*100;
+
+    printf("Common\t\t--->\t%d\nRare\t\t--->\t%d\nEpic\t\t--->\t%d\nUltimate\t--->\t%d\n", common_percentage, rare_percentage,
+                                                                                           epic_percentage, ultimate_percentage);
+}
+
 int main()
 {
     int window_width  = 1920;
@@ -125,7 +181,7 @@ int main()
 
     Asset face_asset = {};
     Asset eyes_asset = {};
-    Asset hat_asset = {};
+    Asset hat_asset  = {};
 
     int unique_combinations[MAX_BUFFER] = {};
     Combination combination = {};
@@ -249,89 +305,13 @@ int main()
 #endif
     }
 
-    // Print the asset count for each individual asset.
+    // Print the asset statistics.
     {
         printf("FACE:\n");
-        float total_assets = 0;
-        int common_count   = 0;
-        int rare_count     = 0;
-        int epic_count     = 0;
-        int ultimate_count = 0;
-        for(int i = 0; i < MAX_BUFFER; i++)
-        {
-            if(face_asset.counter[i] != 0)
-            {
-                if(i >= 40)
-                {
-                    ultimate_count += face_asset.counter[i];
-                }
-                else if(i >= 30 && i <= 39)
-                {
-                    epic_count += face_asset.counter[i];
-                }
-                else if(i >= 20 && i <= 29)
-                {
-                    rare_count += face_asset.counter[i];
-                }
-                else
-                {
-                    common_count += face_asset.counter[i];
-                }
-
-                total_assets += face_asset.counter[i];
-                printf("%d\t--->\t%d\n", i, face_asset.counter[i]);
-            }
-        }
-
-        printf("FACE PERCENTAGES:\n");
-        int common_percentage   = (common_count   / total_assets)*100;
-        int rare_percentage     = (rare_count     / total_assets)*100;
-        int epic_percentage     = (epic_count     / total_assets)*100;
-        int ultimate_percentage = (ultimate_count / total_assets)*100;
-
-        printf("Common\t\t--->\t%d\nRare\t\t--->\t%d\nEpic\t\t--->\t%d\nUltimate\t--->\t%d\n", common_percentage, rare_percentage,
-                                                                                         epic_percentage, ultimate_percentage);
-
+        Print_Asset_Stats(&face_asset);
         printf("EYES:\n");
-        total_assets = 0;
-        for(int i = 0; i < MAX_BUFFER; i++)
-        {
-            if(eyes_asset.counter[i] != 0)
-            {
-                total_assets += eyes_asset.counter[i];
-                printf("%d\t--->\t%d\n", i, eyes_asset.counter[i]);
-            }
-        }
-        printf("EYES PERCENTAGES:\n");
-        for(int i = 0; i < MAX_BUFFER; i++)
-        {
-            if(eyes_asset.counter[i] != 0)
-            {
-
-                int percentage = (eyes_asset.counter[i] / total_assets)*100;
-                printf("%d\t--->\t%d\n", i, percentage);
-            }
-        }
-
+        Print_Asset_Stats(&eyes_asset);
         printf("HAT:\n");
-        total_assets = 0;
-        for(int i = 0; i < MAX_BUFFER; i++)
-        {
-            if(hat_asset.counter[i] != 0)
-            {
-                total_assets += hat_asset.counter[i];
-                printf("%d\t--->\t%d\n", i, hat_asset.counter[i]);
-            }
-        }
-        printf("HAT PERCENTAGES:\n");
-        for(int i = 0; i < MAX_BUFFER; i++)
-        {
-            if(hat_asset.counter[i] != 0)
-            {
-
-                int percentage = (hat_asset.counter[i] / total_assets)*100;
-                printf("%d\t--->\t%d\n", i, percentage);
-            }
-        }
+        Print_Asset_Stats(&hat_asset);
     }
 }
