@@ -223,11 +223,11 @@ int main()
                 Choose_Rarity(&hat_rarity,  hat_filepath,  &rng);
 
                 char *face_asset_path = Randomised_Asset(&combination.face, face_rarity,
-                                                    face_filepath, &face_asset, &rng);
+                                                         face_filepath, &face_asset, &rng);
                 char *eyes_asset_path = Randomised_Asset(&combination.eyes, eyes_rarity, 
-                                                    eyes_filepath, &eyes_asset, &rng);
+                                                         eyes_filepath, &eyes_asset, &rng);
                 char *hat_asset_path  = Randomised_Asset(&combination.hat, hat_rarity,
-                                                    hat_filepath, &hat_asset, &rng);
+                                                         hat_filepath, &hat_asset, &rng);
 
                 strcat(face_filepath, face_asset_path);
                 strcat(eyes_filepath, eyes_asset_path);
@@ -263,46 +263,24 @@ int main()
                 unique_combinations[combo_index] = combination.id;
                 combo_index++;
                 combo_count++;
+
+                DrawTexture(face, 0, 0, RAYWHITE);
+                DrawTexture(eyes, 0, 0, RAYWHITE);
+                DrawTexture(hat,  0, 0, RAYWHITE);
+                EndDrawing();
+
+                // Export the unique picture
+                Image gen = GetScreenData();
+                char export_path[MAX_BUFFER] = "../assets/exports/";
+                char *file_type = ".png";
+                char file[10];
+                sprintf(file, "%d", export_count);
+                strcat(export_path, file);
+                strcat(export_path, file_type);
+                ExportImage(gen, export_path);
+                export_count++;
             }
         }
-
-        DrawTexture(face, 0, 0, RAYWHITE);
-        DrawTexture(eyes, 0, 0, RAYWHITE);
-        DrawTexture(hat,  0, 0, RAYWHITE);
-        EndDrawing();
-        export_count++;
-
-        // Print to console for debugging.
-#if 0
-        {
-            printf("face =\t%d\neyes =\t%d\nhat =\t%d\nid =\t%d\n", combination.face, combination.eyes,
-                                                                    combination.hat,  combination.id);
-        }
-#endif
-
-
-#if 0
-        // Export some random pics.
-        if(export_count < MAX_BUFFER)
-        {
-            Image gen = GetScreenData();
-            char export_path[MAX_BUFFER] = "../../assets/exports/";
-            char *file_type = ".png";
-            char file[10];
-            sprintf(file, "%d", export_count);
-            strcat(export_path, file);
-            strcat(export_path, file_type);
-            ExportImage(gen, export_path);
-            export_count++;
-        }
-#endif
-        // Print array of unique combinations for debugging.
-#if 0
-        for(int i = 0; i < combo_index; i++)
-        {
-            printf("%d\t--->\t%d\n", i, unique_combinations[i]);
-        }
-#endif
     }
 
     // Print the asset statistics.
