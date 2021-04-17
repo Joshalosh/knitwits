@@ -51,7 +51,7 @@ Directory_Count(char *filepath)
 internal void 
 Choose_Rarity(int *rarity_group, char *filepath, pcg32_random_t *rng)
 {
-    uint32_t rand_num = (pcg32_random_r(rng) % (100 - 0 + 1)) + 0;
+    uint32_t rand_num = pcg32_random_r(rng) % 101;
     *rarity_group = 0;
 
     if(rand_num == 0 || rand_num == 100)
