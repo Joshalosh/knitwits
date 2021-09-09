@@ -4,7 +4,7 @@
 #define global_variable static
 #define local_persist static
 
-#define MAX_BUFFER 100
+#define MAX_BUFFER 600
 
 struct Asset
 {
@@ -19,9 +19,15 @@ struct pcg32_random_t
 
 struct Combination
 {
+    int background;
     int face;
+    int mouth;
+    int nose;
     int eyes;
+    int beard;
+    int hair;
     int hat;
+    int accessories;
     int id;
 };
 
